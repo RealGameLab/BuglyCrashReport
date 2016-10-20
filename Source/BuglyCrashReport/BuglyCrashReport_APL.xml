@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root xmlns:android="http://schemas.android.com/apk/res/android">
+  <init>
+    <log text="Bugly init"/>
+    <setStringFromProperty result="BuglyAppID" ini="Game" section="/Script/BuglyCrashReport.BuglyCrashReportSettings" property="AppID" default="0"/>
+    <setStringFromProperty result="BuglyAppVersion" ini="Game" section="/Script/BuglyCrashReport.BuglyCrashReportSettings" property="AppVersion" default="0"/>
+    <setStringFromProperty result="BuglyAppChannel" ini="Game" section="/Script/BuglyCrashReport.BuglyCrashReportSettings" property="AppChannel" default="0"/>
+    <setBoolFromProperty result="bBuglyEnableDebug" ini="Game" section="/Script/BuglyCrashReport.BuglyCrashReportSettings" property="bAppEnableDebug" default="false"/>
+  </init>
+
+  <resourceCopies>
+    <copyFile src="$S(PluginDir)/../../Source/ThirdParty/AndroidLibs/$S(Architecture)/libBugly.so"
+				  dst="$S(BuildDir)/libs/$S(Architecture)/libBugly.so" />
+  </resourceCopies>
+
+  <proguardAdditions>
+    <insert>
+      -dontwarn com.tencent.bugly.**
+      -keep public class com.tencent.bugly.**{*;}
+    </insert>
+  </proguardAdditions>
+
+  <prebuildCopies>
+    <copyDir src="$S(PluginDir)/../../Source/ThirdParty/Android"
+            dst="$S(BuildDir)/libs" />
+  </prebuildCopies>
+
+  <gameActivityImportAdditions>
+    <insert>
+      import com.tencent.bugly.crashreport.CrashReport;
+    </insert>
+  </gameActivityImportAdditions>
+
+  <androidManifestUpdates>
+    <addElements tag="application">
+      <meta-data android:name="BUGLY_APPID" />
+      <meta-data android:name="BUGLY_APP_VERSION" />
+      <meta-data android:name="BUGLY_APP_CHANNEL" />
+      <meta-data android:name="BUGLY_ENABLE_DEBUG" />
+    </addElements>
+
+    <loopElements tag="meta-data">
+      <setStringFromAttribute result="metaDataName" tag="$" name="android:name"/>
+
+      <setBoolIsEqual result="bBuglyAppIDMeta" arg1="$S(metaDataName)" arg2="BUGLY_APPID"/>
+      <if condition="bBuglyAppIDMeta">
+        <true>
+          <addAttribute tag="$" name="android:value" value="$S(BuglyAppID)"/>
+        </true>
+      </if>
+      <setBoolIsEqual result="bBuglyAppVersionMeta" arg1="$S(metaDataName)" arg2="BUGLY_APP_VERSION"/>
+      <if condition="bBuglyAppVersionMeta">
+        <true>
+          <addAttribute tag="$" name="android:value" value="$S(BuglyAppVersion)"/>
+        </true>
+      </if>
+      <setBoolIsEqual result="bBuglyAppChannelMeta" arg1="$S(metaDataName)" arg2="BUGLY_APP_CHANNEL"/>
+      <if condition="bBuglyAppChannelMeta">
+        <true>
+          <addAttribute tag="$" name="android:value" value="$S(BuglyAppChannel)"/>
+        </true>
+      </if>
+      <setBoolIsEqual result="bBuglyEnableDebugMeta" arg1="$S(metaDataName)" arg2="BUGLY_ENABLE_DEBUG"/>
+      <if condition="bBuglyEnableDebugMeta">
+        <true>
+          <if condition="bBuglyEnableDebug">
+            <true>
+              <addAttribute tag="$" name="android:value" value="true"/>
+            </true>
+            <false>
+              <addAttribute tag="$" name="android:value" value="false"/>
+            </false>
+          </if>
+        </true>
+      </if>
+    </loopElements>
+
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.READ_LOGS" />
+  </androidManifestUpdates>
+
+  <gameActivityClassAdditions>
+    <insert>
+      public boolean BuglyCrashReportInitialized = false;
+
+      public void AndroidThunkJava_ForceCrash()
+      {
+      CrashReport.testJavaCrash();
+      }
+
+      public void AndroidThunkJava_ForceException()
+      {
+      throw new RuntimeException("This is a crash");
+      }
+
+      public void AndroidThunkJava_SetUserIdentifier(String Identifier)
+      {
+      CrashReport.setUserId(Identifier);
+      }
+    </insert>
+  </gameActivityClassAdditions>
+
+  <gameActivityOnCreateAdditions>
+    <insert>
+      if(!BuglyCrashReportInitialized)
+      {
+      CrashReport.initCrashReport(getApplicationContext());
+      BuglyCrashReportInitialized = true;
+      }
+    </insert>
+  </gameActivityOnCreateAdditions>
+
+  <soLoadLibrary>
+    <loadLibrary name="Bugly" failmsg="Bugly library not loaded and required!" />
+  </soLoadLibrary>
+</root>
