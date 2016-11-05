@@ -8,15 +8,15 @@ class UBuglyCrashReportSettings : public UObject
 	GENERATED_BODY()
 	
 public:
-	UPROPERTY(Config, EditAnywhere, meta = (DisplayName = "Api ID"))
+	UPROPERTY(Config, EditAnywhere, Category = "Bugly", meta = (DisplayName = "Api ID"))
 	FString AppID;
 
-	UPROPERTY(Config, EditAnywhere, meta = (DisplayName = "Api Version"))
+	UPROPERTY(Config, EditAnywhere, Category = "Bugly", meta = (DisplayName = "Api Version"))
 	FString AppVersion;
 
-	UPROPERTY(Config, EditAnywhere, meta = (DisplayName = "Api Channel"))
+	UPROPERTY(Config, EditAnywhere, Category = "Bugly", meta = (DisplayName = "Api Channel"))
 	FString AppChannel;
 
-	UPROPERTY(Config, EditAnywhere, meta = (DisplayName = "Api Enable Debug"))
+	UPROPERTY(Config, EditAnywhere, Category = "Bugly", meta = (DisplayName = "Api Enable Debug"))
 	bool bAppEnableDebug;
 };
