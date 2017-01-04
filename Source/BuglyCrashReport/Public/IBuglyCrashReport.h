@@ -2,6 +2,8 @@
 
 #include "ModuleManager.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(LogBuglyCrashReport, Log, All);
+
 class IBuglyCrashReport : public IModuleInterface
 {
 public:

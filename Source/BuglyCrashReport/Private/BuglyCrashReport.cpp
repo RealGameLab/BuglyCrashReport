@@ -1,4 +1,4 @@
-#include "BuglyCrashReportPrivatePCH.h"
+#include "IBuglyCrashReport.h"
 #include "BuglyCrashReportSettings.h"
 #include "BuglyCrashReportBPLibrary.h"
 #include "ISettingsModule.h"
